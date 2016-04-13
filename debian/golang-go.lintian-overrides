@@ -1,0 +1,2 @@
+# Go always links statically.
+golang-go: statically-linked-binary
