@@ -105,7 +105,7 @@ func downloadPaths(args []string) []string {
 		if strings.Contains(a, "...") {
 			var expand []string
 			// Use matchPackagesInFS to avoid printing
-			// warnings.  They will be printed by the 
+			// warnings.  They will be printed by the
 			// eventual call to importPaths instead.
 			if build.IsLocalImport(a) {
 				expand = matchPackagesInFS(a)
@@ -259,6 +259,11 @@ func downloadPackage(p *Package) error {
 		}
 	}
 	root := filepath.Join(p.build.SrcRoot, rootPath)
+
+	if err := checkNestedVCS(vcs, root, p.build.SrcRoot); err != nil {
+		return err
+	}
+
 	// If we've considered this repository already, don't do it again.
 	if downloadRootCache[root] {
 		return nil
