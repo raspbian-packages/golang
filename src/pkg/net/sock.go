@@ -33,6 +33,15 @@ func socket(net string, f, t, p int, ipv6only bool, la, ra syscall.Sockaddr, toA
 		return nil, err
 	}
 
+	// Allow IPv4 on IPv6 sockets.
+	if f == syscall.AF_INET6 {
+		err = syscall.SetsockoptInt(s, syscall.IPPROTO_IPV6, syscall.IPV6_V6ONLY, 0)
+		if err != nil {
+			closesocket(s)
+			return nil, err
+		}
+	}
+
 	var bla syscall.Sockaddr
 	if la != nil {
 		bla, err = listenerSockaddr(s, f, la, toAddr)
