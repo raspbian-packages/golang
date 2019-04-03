@@ -361,6 +361,10 @@ func ParseRequestURI(rawurl string) (url *URL, err error) {
 func parse(rawurl string, viaRequest bool) (url *URL, err error) {
 	var rest string
 
+	if stringContainsCTLByte(rawurl) {
+		return nil, errors.New("net/url: invalid control character in URL")
+	}
+
 	if rawurl == "" && viaRequest {
 		err = errors.New("empty url")
 		goto Error
@@ -697,4 +701,15 @@ func (u *URL) RequestURI() string {
 		result += "?" + u.RawQuery
 	}
 	return result
+}
+
+// stringContainsCTLByte reports whether s contains any ASCII control character.
+func stringContainsCTLByte(s string) bool {
+	for i := 0; i < len(s); i++ {
+		b := s[i]
+		if b < ' ' || b == 0x7f {
+			return true
+		}
+	}
+	return false
 }
